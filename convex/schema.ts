@@ -12,18 +12,12 @@ export default defineSchema({
     fuScore: v.optional(v.number()),
     verdict: v.optional(v.string()),
     suspectedPrompt: v.optional(v.string()),
-    archetype: v.optional(v.string()),
-    receipts: v.optional(v.array(v.string())),
+    breakdown: v.optional(v.array(v.string())),
     searchResults: v.optional(v.any()),
     // Monetization & The Daily Slop Board
     isArchived: v.optional(v.boolean()),
     humanProofVideoUrl: v.optional(v.string()),
     bountyPoolAmount: v.optional(v.number()),
-    // Slop Bomb fields
-    isSlopBomb: v.optional(v.boolean()),
-    bomberId: v.optional(v.string()),
-    targetReadAt: v.optional(v.number()),
-    detonationTime: v.optional(v.number()),
   }),
   users: defineTable({
     // empty for now

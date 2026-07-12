@@ -1,40 +1,11 @@
-import { query, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
 import { v } from "convex/values";
-
-export const get = query({
-  args: { id: v.id("roasts") },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
-
-export const getLeaderboard = query({
-  args: {},
-  handler: async (ctx) => {
-    const roasts = await ctx.db
-      .query("roasts")
-      .filter((q) => q.eq(q.field("isArchived"), false))
-      .collect();
-    
-    // Sort by bountyPoolAmount descending, then fuScore descending
-    return roasts.sort((a, b) => {
-      const bountyA = a.bountyPoolAmount || 0;
-      const bountyB = b.bountyPoolAmount || 0;
-      if (bountyB !== bountyA) {
-        return bountyB - bountyA;
-      }
-      return (b.fuScore || 0) - (a.fuScore || 0);
-    }).slice(0, 20);
-  },
-});
 
 export const createRoast = mutation({
   args: {
     contentText: v.string(),
     sourceType: v.union(v.literal("text"), v.literal("youtube")),
     sourceUrl: v.optional(v.string()),
-    isSlopBomb: v.optional(v.boolean()),
-    bomberId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const roastId = await ctx.db.insert("roasts", {
@@ -44,9 +15,6 @@ export const createRoast = mutation({
       status: args.sourceType === "youtube" ? "extracting_transcript" : "scanning_plagiarism",
       isArchived: false,
       bountyPoolAmount: 0,
-      isSlopBomb: args.isSlopBomb,
-      bomberId: args.bomberId,
-      detonationTime: args.isSlopBomb ? Date.now() + 24 * 60 * 60 * 1000 : undefined,
     });
     return roastId;
   },
@@ -103,8 +71,7 @@ export const updateRoastScores = mutation({
     fuScore: v.optional(v.number()),
     verdict: v.optional(v.string()),
     suspectedPrompt: v.optional(v.string()),
-    archetype: v.optional(v.string()),
-    receipts: v.optional(v.array(v.string())),
+    breakdown: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const { id, ...scores } = args;
@@ -112,23 +79,5 @@ export const updateRoastScores = mutation({
       ...scores,
       status: "scored",
     });
-  },
-});
-
-export const markRoastAsRead = mutation({
-  args: { id: v.id("roasts") },
-  handler: async (ctx, args) => {
-    const roast = await ctx.db.get(args.id);
-    if (!roast) throw new Error("Roast not found");
-    if (roast.targetReadAt === undefined) {
-      await ctx.db.patch(args.id, { targetReadAt: Date.now() });
-    }
-  },
-});
-
-export const payRansom = mutation({
-  args: { id: v.id("roasts") },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { isArchived: true });
   },
 });
