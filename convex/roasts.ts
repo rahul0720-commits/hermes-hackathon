@@ -34,7 +34,7 @@ export const updateRoastSearchResults = mutation({
 export const updateRoastScores = mutation({
   args: {
     id: v.id("roasts"),
-    aiSlopScore: v.optional(v.number()),
+    fuMeter: v.optional(v.number()),
     originalityScore: v.optional(v.number()),
     fuScore: v.optional(v.number()),
     verdict: v.optional(v.string()),

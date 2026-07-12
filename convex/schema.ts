@@ -7,7 +7,7 @@ export default defineSchema({
     sourceType: v.union(v.literal("text"), v.literal("youtube")),
     sourceUrl: v.optional(v.string()),
     status: v.union(v.literal("pending"), v.literal("search_complete"), v.literal("scored")),
-    aiSlopScore: v.optional(v.number()),
+    fuMeter: v.optional(v.number()),
     originalityScore: v.optional(v.number()),
     fuScore: v.optional(v.number()),
     verdict: v.optional(v.string()),

@@ -1,6 +1,6 @@
-export async function generateSlopScore(content: string, searchResults: Record<string, unknown>[], hermesApiKey: string) {
+export async function generateFUMeter(content: string, searchResults: Record<string, unknown>[], hermesApiKey: string) {
   const fallback = {
-    aiSlopScore: 85,
+    fuMeter: 85,
     originalityScore: 20,
     fuScore: 90,
     verdict: "A perfect storm of LinkedIn hustle culture buzzwords.",
@@ -12,7 +12,7 @@ export async function generateSlopScore(content: string, searchResults: Record<s
   };
 
   if (!hermesApiKey) {
-    console.warn("No HERMES_API_KEY provided, returning fallback slop score.");
+    console.warn("No HERMES_API_KEY provided, returning fallback FU Meter.");
     return fallback;
   }
 
@@ -28,18 +28,18 @@ export async function generateSlopScore(content: string, searchResults: Record<s
         messages: [
           {
             role: "system",
-            content: `You are a cynical, chain-smoking senior editor who absolutely hates LinkedIn hustle culture, thought leaders, and ghostwritten generic content. You believe the best way to catch AI slop is with more AI slop. Your job is to analyze content and assign a "Slop Score" based on how likely it is to be AI-generated garbage.
+            content: `You are a cynical, chain-smoking senior editor who absolutely hates LinkedIn hustle culture, thought leaders, and ghostwritten generic content. You believe the best way to catch AI slop is with more AI slop. Your job is to analyze content and assign a "FU Meter" based on how likely it is to be AI-generated garbage.
 
 CRITICAL RULES FOR SCORING (The "Geometric Quality Gate"):
 1. The "Buzzword-to-Content Ratio" (BCR): Aggressively penalize the use of words like: "robust", "resilient", "enterprise-grade", "holistic", "delve", "fast-paced landscape", "synergy", "unlock your potential", "testament to".
 2. Structural Penalties: Dock points for perfect 3-part listicles, opening paragraphs that hedge ("While opinions vary...", "It's important to note..."), and concluding paragraphs starting with "In conclusion", "Ultimately", or "At the end of the day".
 3. AI Politeness & Perfection: If the grammar is suspiciously perfect, or it uses phrases like "hope this helps" or "feel free to", flag it. Humans make mistakes; AI is too competent.
-4. "Smoking Guns": If the text reads like Claude laundering its own output, set the AI Slop Score extremely high (>90).
+4. "Smoking Guns": If the text reads like Claude laundering its own output, set the FU Meter extremely high (>90).
 
 OUTPUT FORMAT:
 You MUST return ONLY a valid JSON object with the following schema:
 {
-  "aiSlopScore": number (0-100, where 100 is maximum AI slop),
+  "fuMeter": number (0-100, where 100 is maximum AI slop),
   "originalityScore": number (0-100, where 0 is entirely plagiarized/generic, use the search results as evidence),
   "fuScore": number (0-100, overall 'fuck you' / cringe rating of the content),
   "verdict": string (A savage, sarcastic one-line sentence, max 15 words. Example: "This reads like GPT-4 laundering a 2022 Medium article.", "Suspiciously competent. Real humans write worse than this.", "We calculated your burstiness. It proves you're a robot."),
@@ -56,7 +56,7 @@ You MUST return ONLY a valid JSON object with the following schema:
     });
 
     if (!response.ok) {
-       console.warn(`generateSlopScore API error: ${response.status} ${response.statusText}`);
+       console.warn(`generateFUMeter API error: ${response.status} ${response.statusText}`);
        return fallback;
     }
 
@@ -66,18 +66,18 @@ You MUST return ONLY a valid JSON object with the following schema:
     try {
       const parsed = JSON.parse(contentText);
       return {
-        aiSlopScore: typeof parsed.aiSlopScore === 'number' ? parsed.aiSlopScore : fallback.aiSlopScore,
+        fuMeter: typeof parsed.fuMeter === 'number' ? parsed.fuMeter : fallback.fuMeter,
         originalityScore: typeof parsed.originalityScore === 'number' ? parsed.originalityScore : fallback.originalityScore,
         fuScore: typeof parsed.fuScore === 'number' ? parsed.fuScore : fallback.fuScore,
         verdict: typeof parsed.verdict === 'string' ? parsed.verdict : fallback.verdict,
         breakdown: Array.isArray(parsed.breakdown) ? parsed.breakdown : fallback.breakdown
       };
     } catch (e) {
-      console.error("Failed to parse generated slop score JSON:", e);
+      console.error("Failed to parse generated FU Meter JSON:", e);
       return fallback;
     }
   } catch (error) {
-    console.error("Error generating slop score:", error);
+    console.error("Error generating FU Meter:", error);
     return fallback;
   }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { extractYouTubeTranscript } from "@/lib/youtube";
 import { extractKeyPhrases, runOriginalityScan } from "@/lib/linkup";
-import { generateSlopScore } from "@/lib/hermes";
+import { generateFUMeter } from "@/lib/hermes";
 
 export async function POST(request: Request) {
   try {
@@ -40,8 +40,8 @@ export async function POST(request: Request) {
     const searchResults = await runOriginalityScan(phrases, linkupApiKey);
 
     // Phase 4: LLM Scoring Pipeline
-    // 3. Generate Slop Score
-    const scoreResult = await generateSlopScore(textToAnalyze, searchResults, hermesApiKey);
+    // 3. Generate FU Meter
+    const scoreResult = await generateFUMeter(textToAnalyze, searchResults, hermesApiKey);
 
     return NextResponse.json({
       success: true,

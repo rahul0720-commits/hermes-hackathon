@@ -1,8 +1,8 @@
-# SlopScore — Build Plan
+# FU — Build Plan
 
 ## Overview
 
-- **Product:** SlopScore (slopcheck.app) — paste content → AI slop verdict card
+- **Product:** FU (fu.app) — paste content → AI slop verdict card
 - **Track:** Hermes Buildathon · Virality
 - **Timeline:** 8 hours total
 - **Stack:** Next.js 14 (App Router), Convex, Hermes + GPT-5.6, LinkUp, Cloudflare Pages, Satori, Datafast
@@ -45,7 +45,7 @@
 Files: `src/app/page.tsx`, `src/components/InputForm.tsx`, `src/styles/globals.css`
 
 - [ ] Dark theme layout with Tailwind
-- [ ] Hero: "SlopCheck — Roast AI slop in seconds"
+- [ ] Hero: "FU — Roast AI slop in seconds"
 - [ ] Subtitle: "Paste a URL or drop content text. Get a savage verdict card."
 - [ ] Tab toggle: **URL** | **Paste text**
 - [ ] URL mode: text input + "Roast it" button
@@ -66,21 +66,21 @@ Files: `src/app/page.tsx`, `src/components/InputForm.tsx`, `src/styles/globals.c
 Files: `src/components/ScoreCard.tsx`
 
 - [ ] Dark background (`#0f0f0f`), rounded corners, subtle border
-- [ ] Top: robot emoji + "SLOPCHECK" branding
+- [ ] Top: robot emoji + "FU" branding
 - [ ] Content attribution: first 10 words + "@CreatorHandle" (if extractable)
 - [ ] Score bars:
   - "AI SLOP" — filled bar (red gradient), percentage right-aligned
   - "ORIGINALITY" — filled bar (green gradient), percentage right-aligned
 - [ ] FU Score: large centered number with label
 - [ ] Verdict: italic, medium weight, quoted
-- [ ] Footer: `slopcheck.app/roast/[id]`
+- [ ] Footer: `fu.app/roast/[id]`
 - [ ] Desktop: fixed width 500px
 - [ ] Mobile: full width with padding
 - [ ] Scores animate from 0 to final value on mount (CSS transition)
 - [ ] Card fades in with slight scale
 - [ ] Handle edge cases: all 0 (empty content), all 100 (max slop)
 
-**Props contract:** `{ aiSlopScore, originalityScore, fuScore, verdict, breakdown, contentPreview, creatorHandle, roastId }`
+**Props contract:** `{ aiFU, originalityScore, fuScore, verdict, breakdown, contentPreview, creatorHandle, roastId }`
 **Depends on:** Phase 1 (page structure), Backend Phase 4 (data shape)
 
 ---
@@ -113,7 +113,7 @@ Files: `src/app/roast/[id]/page.tsx`, `src/app/roast/[id]/opengraph-image.tsx`
 - [ ] If pending → polling every 2s until status === `scored`
 - [ ] Display `<ScoreCard />` component
 - [ ] "Share this roast" section:
-  - [ ] Copy link button (copies `slopcheck.app/roast/[id]`)
+  - [ ] Copy link button (copies `fu.app/roast/[id]`)
   - [ ] Download PNG button
   - [ ] Share to LinkedIn button (opens share dialog with card + text)
 - [ ] OG image route renders verdict card at request time
@@ -144,7 +144,7 @@ Files: `src/components/AuthModal.tsx`, `src/app/layout.tsx`
 Files: `src/app/leaderboard/page.tsx`, `src/components/LeaderboardTable.tsx`
 
 - [ ] Leaderboard page: `/leaderboard`
-- [ ] Table: Rank | Content preview | AI Slop % | FU Score | Link
+- [ ] Table: Rank | Content preview | FU Meter % | FU Score | Link
 - [ ] Auto-refresh every 30s
 - [ ] "Most slopped content today" header
 - [ ] Nav link from landing page
@@ -197,7 +197,7 @@ Files: `src/lib/hermes.ts`, `convex/roasts.ts`
   - System prompt (AI slop detection expert)
   - LinkUp search results (if any)
   - Content text
-  - Instruction to return JSON with `aiSlopScore`, `originalityScore`, `fuScore`, `verdict`, `breakdown`
+  - Instruction to return JSON with `aiFU`, `originalityScore`, `fuScore`, `verdict`, `breakdown`
 - [ ] Parse JSON from LLM response
 - [ ] Validate ranges (0–100 for scores, verdict ≤15 words)
 - [ ] Fallback: if JSON parsing fails, retry once with stricter prompt
@@ -212,7 +212,7 @@ Files: `src/lib/hermes.ts`, `convex/roasts.ts`
 Files: `src/app/api/create-checkout-session/route.ts`, `src/app/api/webhooks/dodo/route.ts`, `convex/users.ts`
 
 - [ ] Sign up for Dodo Payments, get API keys
-- [ ] Create product: "SlopCheck Unlimited" — $5/month
+- [ ] Create product: "FU Unlimited" — $5/month
 - [ ] `POST /api/create-checkout-session` → redirect to Dodo hosted checkout
 - [ ] Webhook handler `/api/webhooks/dodo` → update subscription status in Convex
 - [ ] `getUserSubscription(userId)` → gates unlimited roasts
@@ -315,7 +315,7 @@ DATFAST_SNIPPET_ID=
 ## File Structure
 
 ```
-slopcheck/
+fu/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx

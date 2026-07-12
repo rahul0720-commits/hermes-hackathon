@@ -1,10 +1,10 @@
-# SlopScore — API Contract & Integration Guide
+# FU — API Contract & Integration Guide
 
 This document defines the exact contract between the Frontend (FE) and Backend (BE) to allow parallel development. The backend has been fully implemented in `/api/analyze` and Convex mutations.
 
 ## 1. Main Analysis Endpoint
 **Route:** `POST /api/analyze`
-**Purpose:** Takes raw text or a YouTube URL, runs the LinkUp originality scan, and generates the LLM Slop Score.
+**Purpose:** Takes raw text or a YouTube URL, runs the LinkUp originality scan, and generates the LLM FU Score.
 
 ### Request Body
 ```json
@@ -34,7 +34,7 @@ This document defines the exact contract between the Frontend (FE) and Backend (
     }
   ],
   "score": {
-    "aiSlopScore": 85,
+    "fuMeter": 85,
     "originalityScore": 12,
     "fuScore": 92,
     "verdict": "Reads like GPT-4 had a stroke while reading atomic habits.",
@@ -86,7 +86,7 @@ The FE must use the Convex React hooks to mutate and query state.
   searchResults?: Array<{ phrase: string, foundAtUrl: string, similarity: number }>,
   
   // Appears after scored
-  aiSlopScore?: number,
+  fuMeter?: number,
   originalityScore?: number,
   fuScore?: number,
   verdict?: string,
@@ -139,7 +139,7 @@ await updateSearch({
 // Save final scores
 await updateScores({
   id: roastId,
-  aiSlopScore: data.score.aiSlopScore,
+  fuMeter: data.score.fuMeter,
   originalityScore: data.score.originalityScore,
   fuScore: data.score.fuScore,
   verdict: data.score.verdict,
