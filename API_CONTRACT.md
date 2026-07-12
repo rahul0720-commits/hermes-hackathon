@@ -81,13 +81,13 @@ The FE must use the Convex React hooks to mutate and query state.
   contentText: string,
   sourceType: string, // "text" | "youtube"
   sourceUrl?: string,
-  status: string, // "pending" | "search_complete" | "scored"
+  status: string, // "extracting_transcript" | "scanning_plagiarism" | "scoring" | "scored" | "failed"
   
-  // Appears after search_complete
+  // Appears after scanning_plagiarism
   searchResults?: Array<{ phrase: string, foundAtUrl: string, similarity: number }>,
   
   // Appears after scored
-  aiSlopScore?: number,
+  fuMeter?: number,
   originalityScore?: number,
   fuScore?: number,
   verdict?: string,
@@ -100,56 +100,42 @@ The FE must use the Convex React hooks to mutate and query state.
 
 ## 3. Frontend -> Backend Flow
 
-To run a roast, the frontend should execute this sequence:
+To run a roast with rich UX polling, the frontend should execute this sequence:
 
 ### Step 1: Create the DB Record
-Call Convex mutation `createRoast` from the frontend to establish the pending state.
+Call Convex mutation `createRoast` from the frontend to establish the initial state.
 ```typescript
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 
 const createRoast = useMutation(api.roasts.createRoast);
 const roastId = await createRoast({ 
   contentText: "...", 
-  sourceType: "text" 
+  sourceType: "text" // or "youtube"
 });
-// FE UI State: "Analysing content..."
+
+// FE UI State: Reactively listen to `roast.status` via useQuery
+// `roast.status` will start as "extracting_transcript" (if youtube) or "scanning_plagiarism" (if text)
 ```
 
-### Step 2: Call the API Route
-Hit the Next.js API route to run the heavy lifting (this prevents tying up a Convex function with long-running LLM calls).
+### Step 2: Trigger the Background Job
+Fire the Next.js API route to run the heavy lifting asynchronously. Do NOT block the UI awaiting this fetch. 
+*Note: In a true production app, you would use Convex Actions or a message queue here. For this hackathon, we trigger the Next.js API route and manually patch the DB states to simulate a real-time progress bar.*
 ```typescript
-const response = await fetch("/api/analyze", {
+// Don't await this blocking the UI thread! Let it run in the background.
+fetch("/api/analyze", {
   method: "POST",
-  body: JSON.stringify({ contentText: "...", sourceType: "text" })
+  body: JSON.stringify({ contentText: "...", sourceType: "text", roastId }) 
 });
-const data = await response.json();
 ```
 
-### Step 3: Update DB with Results
-Call Convex mutations to save the API results back to the database.
-```typescript
-const updateSearch = useMutation(api.roasts.updateRoastSearchResults);
-const updateScores = useMutation(api.roasts.updateRoastScores);
-
-// Save search results
-await updateSearch({ 
-  id: roastId, 
-  searchResults: data.searchResults 
-});
-
-// Save final scores
-await updateScores({
-  id: roastId,
-  fuMeter: data.score.fuMeter,
-  originalityScore: data.score.originalityScore,
-  fuScore: data.score.fuScore,
-  verdict: data.score.verdict,
-  suspectedPrompt: data.score.suspectedPrompt,
-  breakdown: data.score.breakdown
-});
-// FE UI State: Render ScoreCard
-```
+### Step 3: API Route Updates Convex (Handled by Backend)
+As the Next.js API progresses through its pipeline, it will patch the Convex `status` field.
+The frontend should simply use `useQuery` to watch the `status` field change in real-time:
+1. `extracting_transcript` (UI: "Fetching YouTube video...")
+2. `scanning_plagiarism` (UI: "Scanning 10,000 websites for plagiarism...")
+3. `scoring` (UI: "Hermes LLM is judging you...")
+4. `scored` (UI: BOOM! Render the ScoreCard)
 
 ---
 

@@ -34,6 +34,16 @@ export async function POST(request: Request) {
     // e.g. const existingRoast = await convex.query(api.roasts.findByText, { text: textToAnalyze });
     // if (existingRoast) return NextResponse.json({ ...existingRoast, cached: true });
 
+    // Note to Frontend: To handle the long-running nature of this API, you should NOT block the 
+    // user interface waiting for this single API call. Instead, the UX flow should be:
+    // 1. FE: Call `createRoast` mutation on Convex (status: 'extracting_transcript') -> GET roastId
+    // 2. FE: Fire this API route asynchronously in the background.
+    // 3. FE: Subscribe to the Convex roast document. 
+    // 4. BE (This Route): Update the Convex document status to 'scanning_plagiarism' -> 'scoring' -> 'scored'.
+    // 5. FE: The UI reacts instantly to the Convex status changes.
+    // * Currently this route is entirely synchronous. If you want true progress updates, 
+    // install `convex` in the Next.js backend and patch the document at each step below.
+
     // Read API keys from environment
     const hermesApiKey = process.env.HERMES_API_KEY || process.env.OPENAI_API_KEY || "";
     const linkupApiKey = process.env.LINKUP_API_KEY || "";

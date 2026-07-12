@@ -12,9 +12,21 @@ export const createRoast = mutation({
       contentText: args.contentText,
       sourceType: args.sourceType,
       sourceUrl: args.sourceUrl,
-      status: "pending",
+      status: args.sourceType === "youtube" ? "extracting_transcript" : "scanning_plagiarism",
     });
     return roastId;
+  },
+});
+
+export const updateRoastStatus = mutation({
+  args: {
+    id: v.id("roasts"),
+    status: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      status: args.status,
+    });
   },
 });
 
