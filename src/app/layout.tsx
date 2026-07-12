@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import Providers from "@/components/Providers";
 import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 
@@ -36,9 +37,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-background font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
-        <ConvexClientProvider>
-          {children}
-        </ConvexClientProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

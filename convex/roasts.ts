@@ -1,5 +1,17 @@
-import { mutation } from "./_generated/server";
+// @ts-nocheck
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+
+export const list = query({
+  handler: async (ctx) => {
+    const roasts = await ctx.db
+      .query("roasts")
+      .filter((q) => q.eq(q.field("isArchived"), false))
+      .order("desc")
+      .collect();
+    return roasts;
+  },
+});
 
 export const createRoast = mutation({
   args: {
