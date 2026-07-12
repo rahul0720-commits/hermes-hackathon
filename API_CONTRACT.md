@@ -43,7 +43,8 @@ This document defines the exact contract between the Frontend (FE) and Backend (
     "fuScore": 92,
     "verdict": "Reads like GPT-4 had a stroke while reading atomic habits.",
     "suspectedPrompt": "Write a preachy 3-part listicle about B2B sales but make it sound like a deeply personal revelation.",
-    "breakdown": [
+    "archetype": "The Prompt Engineer",
+    "receipts": [
       "Uses the word 'delve' unironically",
       "3-part listicle structure identical to default Claude output",
       "Zero personal anecdotes or specific evidence provided"
@@ -96,7 +97,14 @@ The FE must use the Convex React hooks to mutate and query state.
   fuScore?: number,
   verdict?: string,
   suspectedPrompt?: string,
-  breakdown?: string[]
+  archetype?: string,
+  receipts?: string[],
+  
+  // Slop Bomb Mechanics
+  isSlopBomb?: boolean,
+  bomberId?: string,
+  targetReadAt?: number,
+  detonationTime?: number
 }
 ```
 
@@ -115,7 +123,9 @@ import { api } from "../convex/_generated/api";
 const createRoast = useMutation(api.roasts.createRoast);
 const roastId = await createRoast({ 
   contentText: "...", 
-  sourceType: "text" // or "youtube"
+  sourceType: "text", // or "youtube"
+  isSlopBomb: true, // Optional: if this is an anonymous Slop Bomb
+  bomberId: "user_123" // Optional: ID of the person sending the Slop Bomb
 });
 
 // FE UI State: Reactively listen to `roast.status` via useQuery
@@ -143,7 +153,19 @@ The frontend should simply use `useQuery` to watch the `status` field change in 
 
 ---
 
-## 4. Fallback Behavior Note
+## 5. Additional Mutations (Slop Bombs & Ransom)
+
+The backend provides additional Convex mutations to support the Paranoia / Anonymous Slop Bomb mechanics:
+
+- `markRoastAsRead({ id: Id<"roasts"> })`
+  Call this when the target opens their Slop Bomb link. If `targetReadAt` is undefined, it sets it to `Date.now()`. This can trigger the "💥 DAVE JUST READ IT" notification to the bomber.
+
+- `payRansom({ id: Id<"roasts"> })`
+  Call this when the target successfully pays the ransom. It sets `isArchived: true` to hide the roast from the public Daily Slop Board.
+
+---
+
+## 6. Fallback Behavior Note
 If `HERMES_API_KEY` or `LINKUP_API_KEY` are not set in `.env.local`, the `/api/analyze` endpoint will **gracefully fall back to mock data**. 
 
 This means your frontend colleague can build and test the loading states, the `ScoreCard` animations, and the Convex mutations right now, without needing the actual API keys to be live.
