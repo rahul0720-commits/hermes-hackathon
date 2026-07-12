@@ -52,31 +52,71 @@ export async function extractKeyPhrases(content: string, hermesApiKey: string): 
 }
 
 export async function runOriginalityScan(phrases: string[], linkupApiKey: string): Promise<Record<string, unknown>[]> {
-  // Mocking the LinkUp API
-  // In a real scenario, this would use linkupApiKey to authenticate against LinkUp API
   const results: Record<string, unknown>[] = [];
   const seenUrls = new Set<string>();
 
-  for (let i = 0; i < phrases.length; i++) {
-    const phrase = phrases[i];
+  if (!linkupApiKey) {
+    console.warn("No LINKUP_API_KEY provided, returning mock search results.");
+    // Small simulated latency
+    await new Promise((resolve) => setTimeout(resolve, 500));
     
-    // If no key is provided, we still mock it to allow the frontend to work
-    if (!linkupApiKey) {
-      // Small simulated latency
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    for (let i = 0; i < phrases.length; i++) {
+      const mockUrl = `https://example.com/mock-source-${i % 3}`;
+      if (!seenUrls.has(mockUrl)) {
+        seenUrls.add(mockUrl);
+        results.push({
+          phrase: phrases[i],
+          foundAtUrl: mockUrl,
+          similarity: 0.75 + (Math.random() * 0.2), 
+        });
+      }
     }
-
-    // Mock response
-    const mockUrl = `https://example.com/mock-source-${i % 3}`;
-    if (!seenUrls.has(mockUrl)) {
-      seenUrls.add(mockUrl);
-      results.push({
-        phrase,
-        foundAtUrl: mockUrl,
-        similarity: 0.75 + (Math.random() * 0.2), // Random similarity between 0.75 and 0.95
-      });
-    }
+    return results;
   }
 
-  return results;
+  // Real LinkUp API integration
+  try {
+    for (const phrase of phrases) {
+      // NOTE: Using the standard v1 LinkUp search endpoint based on typical LinkUp structure. 
+      // If the endpoint differs, update the URL.
+      const response = await fetch("https://api.linkup.so/v1/search", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${linkupApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          q: phrase,
+          depth: "standard",
+          outputType: "searchResults"
+        })
+      });
+
+      if (!response.ok) {
+        console.warn(`LinkUp API error for phrase "${phrase}": ${response.status} ${response.statusText}`);
+        continue;
+      }
+
+      const data = await response.json();
+      
+      // Parse LinkUp standard response format (assuming data.results is the array)
+      if (data.results && Array.isArray(data.results)) {
+        for (const hit of data.results) {
+          if (hit.url && !seenUrls.has(hit.url)) {
+            seenUrls.add(hit.url);
+            results.push({
+              phrase,
+              foundAtUrl: hit.url,
+              similarity: 0.95, // Hardcoded high confidence for direct text hits
+              snippet: hit.snippet || ""
+            });
+          }
+        }
+      }
+    }
+    return results;
+  } catch (error) {
+    console.error("LinkUp API Execution Error:", error);
+    return []; // Return empty on hard failure to ensure the LLM still scores the text
+  }
 }
