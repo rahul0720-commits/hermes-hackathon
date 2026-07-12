@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     // install `convex` in the Next.js backend and patch the document at each step below.
 
     // Read API keys from environment
-    const hermesApiKey = process.env.HERMES_API_KEY || process.env.OPENAI_API_KEY || "";
+    const hermesApiKey = process.env.OPENROUTER_API_KEY || process.env.HERMES_API_KEY || process.env.OPENAI_API_KEY || "";
     const linkupApiKey = process.env.LINKUP_API_KEY || "";
 
     // Phase 3: LinkUp Originality Scan

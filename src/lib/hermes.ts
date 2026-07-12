@@ -19,14 +19,16 @@ export async function generateFUMeter(content: string, searchResults: Record<str
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${hermesApiKey}`,
+        "HTTP-Referer": "https://fu.app", // Optional but recommended by OpenRouter
+        "X-Title": "FU App", // Optional but recommended by OpenRouter
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "openrouter/free", // Using exactly what the user requested
         messages: [
           {
             role: "system",

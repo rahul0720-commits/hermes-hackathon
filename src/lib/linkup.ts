@@ -5,14 +5,16 @@ export async function extractKeyPhrases(content: string, hermesApiKey: string): 
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${hermesApiKey}`,
+        "HTTP-Referer": "https://fu.app",
+        "X-Title": "FU App",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // fast model
+        model: "openrouter/free", // Using the free model via OpenRouter
         messages: [
           {
             role: "system",
