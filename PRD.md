@@ -8,22 +8,22 @@ The internet is drowning in AI-generated, plagiarised, recycled content — on L
 
 ## 2. Solution
 
-**FU** — paste a URL or drop content text → get a brutal, shareable verdict card that scores it on:
+**FU** — paste a URL or drop content text → get a brutal, shareable verdict card. It operates on two vicious axes:
 
-- **FU Meter %**
-- **Originality Score** (plagiarism / recycled ideas)
-- **Overall FU Score** (0–100)
+1. **"Spotify Wrapped" Ego-Sharing:** Expose the poster's exact brand of delusion with savage `Archetypes` and specific `Receipts`.
+2. **"Anonymous Slop Bombs":** Weaponized paranoia. Drop an anonymous roast on a target. They have 24 hours to pay the "De-escalation Ransom", or the bomb detonates publicly on the Daily Slop Board.
 
 The card is downloadable as a PNG and has a public shareable URL. Every roast becomes a social post.
 
 ## 3. Target User
 
-- LinkedIn founders/builders who are sick of AI slop and want to publicly call it out
-- Creators who want to defend their content ("see, I'm 100% original")
-- Anyone who wants to drag a competitor or a ghost-written influencer
+- **The Vigilante:** LinkedIn founders/builders sick of AI slop who want to publicly and anonymously call it out.
+- **The Paranoiac:** Creators terrified of being dragged, who will pay to hide their humiliation.
+- **The Troll:** Anyone who wants to drop an anonymous Slop Bomb on a competitor or a ghost-written influencer.
 
 ## 4. Core User Flow
 
+### Standard Flow
 ```
 Landing page
     ↓
@@ -32,15 +32,28 @@ Paste URL (YouTube) OR paste text (LinkedIn/X/anywhere)
 [Analysing...] — LLM + LinkUp web search runs
     ↓
 Verdict card rendered:
-  - FU Meter % with breakdown
-  - Originality % with "sourced from" references
-  - FU Score (0–100) with a one-line savage verdict
+  - FU Meter % + Originality %
+  - Archetype (e.g., "The ChatGPT Thought Leader")
+  - Receipts (Humiliating callouts of specific phrases)
     ↓
 "Share this roast" → copy link / download PNG
     ↓
-[Soft gate] — to share publicly or run more than 3 roasts → sign up (email + first use event)
-    ↓
 Public roast page at fu.app/roast/[id]
+```
+
+### The Slop Bomb Flow
+```
+Bomber drops bomb (toggles "Slop Bomb" mode)
+    ↓
+Bomber sends the anonymous link to the Target
+    ↓
+Target clicks link
+    ↓
+Bomber gets a "💥 Read Receipt" (They saw it!)
+    ↓
+Target sees a 24-hour countdown. They must pay the "De-escalation Ransom" ($5).
+    ↓
+If unpaid after 24h, the roast detonates and is permanently pinned to The Daily Slop Board.
 ```
 
 ## 5. Features (MVP — build order priority)
@@ -50,21 +63,20 @@ Public roast page at fu.app/roast/[id]
 | # | Feature | Notes |
 |---|---------|-------|
 | 1 | Text input + URL input (YouTube only) | YouTube transcript via youtube-transcript-api. LinkedIn/X = paste text. |
-| 2 | LLM analysis pipeline | GPT-5.6 via Hermes. Prompt scores AI-ness, recycled phrasing, originality. Returns structured JSON. |
-| 3 | LinkUp web search for originality check | Feed key claims/phrases from content → LinkUp live search → see if they appear verbatim elsewhere. This is the plagiarism engine. Power-up earned. |
-| 4 | Score card UI | FU Meter %, Originality %, FU Score. One-line savage verdict. Clean, bold, dark card design. |
-| 5 | PNG export | satori or html2canvas — downloadable card. |
-| 6 | Public shareable URL | /roast/[id] — anyone can open it without logging in. |
-| 7 | Signup gate | After 3 free roasts, or to share publicly — Google/email signup. Convex auth. This is where signups are counted. |
+| 2 | LLM analysis pipeline | GPT-5.6 via Hermes. Prompt scores AI-ness and generates Archetype/Receipts. Returns structured JSON. |
+| 3 | LinkUp web search for originality check | Feed key claims/phrases from content → LinkUp live search → see if they appear verbatim elsewhere. |
+| 4 | Score card UI | Archetype, Receipts, FU Meter %, Originality %, FU Score. Clean, bold, dark card design. |
+| 5 | PNG export | Client-side export — downloadable card. |
+| 6 | Public shareable URL | /roast/[id] — anyone can open it. |
+| 7 | Monetization Engine | Outrage Bounty (pay to boost a roast) & De-escalation Ransom (pay to hide). |
 | 8 | Analytics | Datafast snippet live from minute one. Read-only dashboard for judges. |
 
 ### P1 — Nice to have (if time)
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 9 | "Roast leaderboard" | Top 10 most slopped pieces of content roasted today — public feed. Drives return traffic. |
-| 10 | Dodo Payments paywall | $5/month for unlimited roasts. Earns Revenue cross-track bonus (+50pts at half weight). Power-up earned. |
-| 11 | Batch URL input | Drop 5 URLs, get 5 roast cards. Useful for agencies. |
+| 9 | "The Daily Slop Board" | Top 10 most slopped pieces of content roasted today. Public feed. Includes countdowns for active Slop Bombs. |
+| 10 | Batch URL input | Drop 5 URLs, get 5 roast cards. Useful for agencies. |
 
 ### P2 — Cut if under time pressure
 
@@ -81,22 +93,24 @@ Public roast page at fu.app/roast/[id]
 │  "[Post title / first 10 words]"    │
 │  by @CreatorHandle                  │
 │                                     │
-│  FU METER       ████████░░  78%      │
-│  ORIGINALITY   ███░░░░░░░  31%      │
+│  THE VERDICT:                       │
+│  "The ChatGPT Thought Leader"       │
 │                                     │
-│  FU SCORE          82 / 100         │
+│  RECEIPTS:                          │
+│  • "In today's fast-paced world..." │
+│  • "A testament to..."              │
 │                                     │
-│  "This reads like GPT rewrote a     │
-│   2022 Medium article. Twice."      │
+│  FU METER       ████████░░  78%     │
+│  ORIGINALITY    ███░░░░░░░  31%     │
 │                                     │
-│  fu.app/roast/a8x3k          │
+│  fu.app/roast/a8x3k                 │
 └─────────────────────────────────────┘
 ```
 
 - Dark background, high contrast
-- Bold percentage bars (like a progress bar)
-- The one-liner verdict is the most shareable element — make it savage but specific
-- Creator handle visible so when people share the card, it tags the target
+- Features the brutal `Archetype` front and center
+- Bulleted `Receipts` pointing out exact phrases
+- The creator handle visible so when people share the card, it tags the target
 
 ## 7. LLM Prompt Architecture
 
@@ -118,11 +132,11 @@ Public roast page at fu.app/roast/[id]
 You are an expert at detecting AI-generated content and unoriginal ideas.
 
 Analyse this content and return a JSON object with:
-- fuMeter: 0-100 (how AI-generated does this feel? Look for: generic frameworks, listicle structure, hedging language, no personal anecdotes, "In today's fast-paced world" type openers)
-- originality_score: 0-100 (inverse of plagiarism; how original are the ideas? Use the web search results below as evidence)
+- fuMeter: 0-100 (how AI-generated does this feel?)
+- originality_score: 0-100 (inverse of plagiarism; how original are the ideas?)
 - fu_score: 0-100 (overall "this is slop" rating)
-- verdict: one savage but specific sentence, max 15 words
-- breakdown: 3 bullet points explaining the scores
+- archetype: A savage, Spotify-Wrapped style persona name (e.g., "The LinkedIn Reply Guy", "The AI Recycler")
+- receipts: Array of 3 specific, humiliating callouts (exact phrases from the text that prove it's slop)
 
 Web search findings: [LinkUp results]
 
@@ -141,15 +155,15 @@ Content: [content text]
 |-------|------|-----------|
 | Framework | Next.js 14 (App Router) | — |
 | Database + backend | Convex | +25 pts |
-| LLM | Hermes + OpenAI GPT-5.6 | Required (Hermes rule) |
+| LLM | Hermes + GPT-5.6 | Required (Hermes rule) |
 | Web search / originality | LinkUp API | +25 pts |
 | Hosting | Cloudflare Pages | +25 pts |
-| Payments (P1) | Dodo Payments | +25 pts |
-| Card image export | Satori (OG image generation) | — |
+| Payments | Dodo Payments | +25 pts |
+| Card image export | Client-side PNG | — |
 | Analytics | Datafast | Required for judging |
 | YouTube transcript | youtube-transcript-api (Python) or youtubei.js (Node) | — |
 
-**Total reachable power-up points: +100 (or +125 if Wispr used for dictation)**
+**Total reachable power-up points: +100**
 
 ## 9. Distribution Strategy (Day-of)
 
@@ -161,17 +175,13 @@ Seed with 2–3 pre-roasted cards of well-known AI slop creators (with their han
 
 ### Hour 4–5:
 
-DM 10 founder/builder connections directly with a personalised roast of their latest post
-
-Half will repost it — that's your L4 amplification signal (notable reshares)
+DM 10 founder/builder connections directly with an anonymous Slop Bomb of their latest post. Wait for the "💥 Read Receipt" and watch them panic over the De-escalation Ransom.
 
 ### Hour 6:
 
-Post the leaderboard: "Top 5 most AI-slopped LinkedIn posts we've roasted today"
+Post the Daily Slop Board: "Top 5 most AI-slopped LinkedIn posts we've roasted today, and the bounty pool on their heads."
 
-This drives a second wave of engagement as the named creators respond (even if angry)
-
-Signup trigger: Anyone who wants to roast more than 3 posts must sign up. Frictionless — just email or Google. This is your L3/L4 signup engine.
+This drives a second wave of engagement as the named creators respond and trolls pay to boost the roasts.
 
 ## 10. Scoring Forecast
 
@@ -192,15 +202,13 @@ Signup trigger: Anyone who wants to roast more than 3 posts must sign up. Fricti
 | YouTube transcript API breaks | Also support text-paste; YouTube is a nice-to-have layer, not the core |
 | LinkUp results thin for niche content | LLM can still score AI-ness even without web search hits; clearly label "originality check: limited data" |
 | Card looks amateur | Spend 45 minutes on card design upfront — it's your distribution engine |
-| No notable reshares | Pre-seed with roasts of creators who have large audiences; they often respond even if angry (engagement = reach) |
-| Signup conversion low | Make the 3-free-roasts limit hit naturally; don't gate the card view, only sharing and more roasts |
+| Target refuses to pay Ransom | The public humiliation on the Daily Slop Board is the alternative. Trolls can still pay the Outrage Bounty. |
 
 ## 12. What Success Looks Like at 5pm
 
 - Working product live at a real URL
 - YouTube URL → roast card in under 30 seconds
 - Text paste → roast card in under 20 seconds
+- Slop Bomb flow tested: read receipt fires, 24h countdown works, ransom payment hides it.
 - Datafast showing 300+ unique visitors with read-only access ready for judge
-- 80+ signups in Convex auth table (not teammates)
-- 1 notable reshare on LinkedIn visible in analytics
 - Convex + LinkUp + Cloudflare power-ups verified working by a mentor

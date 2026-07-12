@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,9 +18,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SLOPSCORE // Roast AI slop in seconds",
-  description:
-    "Paste a URL or drop content text. Get a savage, shareable verdict card scoring AI slop, originality, and the FU Score.",
+  title: "FU | The AI Slop Roaster",
+  description: "Paste a URL or drop text. Get a savage verdict card.",
 };
 
 export default function RootLayout({
@@ -36,7 +36,9 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-background font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
-        {children}
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
       </body>
     </html>
   );

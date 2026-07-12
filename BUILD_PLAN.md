@@ -50,13 +50,14 @@ Files: `src/app/page.tsx`, `src/components/InputForm.tsx`, `src/styles/globals.c
 - [ ] Tab toggle: **URL** | **Paste text**
 - [ ] URL mode: text input + "Roast it" button
 - [ ] Text mode: `<textarea>` + "Roast it" button
+- [ ] Toggle: **"Send as Anonymous Slop Bomb"** checkbox (passes `isSlopBomb` to backend)
 - [ ] Client-side validation (empty check, URL format hint)
 - [ ] "Analysing content..." spinner with animated dots
 - [ ] Disable button during analysis
 - [ ] Step indicator: Extracting → Searching → Scoring → Rendering
 - [ ] Error states: invalid URL, analysis failure, rate limit hit
 
-**API contract:** `POST /api/analyze` → `{ contentText, sourceType, sourceUrl? }` → `{ roastId }`
+**API contract:** `POST /api/analyze` → `{ contentText, sourceType, sourceUrl?, isSlopBomb }` → `{ roastId }`
 **Depends on:** Phase 0
 
 ---
@@ -68,19 +69,18 @@ Files: `src/components/ScoreCard.tsx`
 - [ ] Dark background (`#0f0f0f`), rounded corners, subtle border
 - [ ] Top: robot emoji + "FU" branding
 - [ ] Content attribution: first 10 words + "@CreatorHandle" (if extractable)
+- [ ] Archetype rendering: Prominent, savage title (e.g. "The ChatGPT Thought Leader")
+- [ ] Receipts rendering: 3-item bulleted list calling out specific phrases
 - [ ] Score bars:
   - "AI SLOP" — filled bar (red gradient), percentage right-aligned
   - "ORIGINALITY" — filled bar (green gradient), percentage right-aligned
-- [ ] FU Score: large centered number with label
-- [ ] Verdict: italic, medium weight, quoted
 - [ ] Footer: `fu.app/roast/[id]`
 - [ ] Desktop: fixed width 500px
 - [ ] Mobile: full width with padding
 - [ ] Scores animate from 0 to final value on mount (CSS transition)
 - [ ] Card fades in with slight scale
-- [ ] Handle edge cases: all 0 (empty content), all 100 (max slop)
 
-**Props contract:** `{ aiFU, originalityScore, fuScore, verdict, breakdown, contentPreview, creatorHandle, roastId }`
+**Props contract:** `{ aiFU, originalityScore, fuScore, archetype, receipts, contentPreview, creatorHandle, roastId }`
 **Depends on:** Phase 1 (page structure), Backend Phase 4 (data shape)
 
 ---
@@ -113,36 +113,34 @@ Files: `src/app/roast/[id]/page.tsx`
   - [ ] Copy link button (copies `fu.app/roast/[id]`)
   - [ ] Download PNG button
   - [ ] Share to LinkedIn button (opens share dialog with card + text)
+- [ ] **Slop Bomb Logic:** If `isSlopBomb` is true, trigger `markRoastAsRead` on page load so the sender gets a Read Receipt.
 
 **Depends on:** Phase 6, Backend Phase 4
 
 ---
 
-### Phase 8 — Signup Gate (45 min)
+### Phase 8 — Monetization & Slop Bomb UX (45 min)
 
-Files: `src/components/AuthModal.tsx`, `src/app/layout.tsx`
+Files: `src/components/RansomModal.tsx`, `src/app/layout.tsx`, `src/app/roast/[id]/page.tsx`
 
-- [ ] `npm install @convex-dev/auth`
-- [ ] Configure Google OAuth + email/password (or magic link)
-- [ ] Auth UI component (Sign in with Google + email form)
-- [ ] Track roast count per session (localStorage) and per user (Convex)
-- [ ] Free tier: 3 roasts
-- [ ] After 3rd roast: show "Sign up for unlimited roasts" modal
-- [ ] "Share publicly" → if not signed in → auth modal
-- [ ] After signup → redirect back to roast page with share action
+- [ ] Render 24-hour countdown timer on Slop Bomb roasts.
+- [ ] Show "De-escalation Ransom" payment button for targets to archive/hide the roast.
+- [ ] Show "Outrage Bounty" payment button for others to boost the roast.
+- [ ] Integrate Dodo Payments for checkout flows (Ransom: $5, Bounty: custom amounts).
+- [ ] Webhook handler `/api/webhooks/dodo` → update roast visibility or bounty pool in Convex.
 
 **Depends on:** Phase 7, Backend Phase 4
 
 ---
 
-### Phase 9 — Leaderboard (P1, 45 min)
+### Phase 9 — The Daily Slop Board (P1, 45 min)
 
 Files: `src/app/leaderboard/page.tsx`, `src/components/LeaderboardTable.tsx`
 
-- [ ] Leaderboard page: `/leaderboard`
-- [ ] Table: Rank | Content preview | FU Meter % | FU Score | Link
+- [ ] Leaderboard page: `/leaderboard` renamed to "The Daily Slop Board"
+- [ ] Table: Rank | Content preview | Archetype | FU Score | Bounty Pool | Link
+- [ ] Highlight Slop Bombs that have detonated (timer expired, ransom unpaid).
 - [ ] Auto-refresh every 30s
-- [ ] "Most slopped content today" header
 - [ ] Nav link from landing page
 
 **Depends on:** Backend Phase 4 (Convex query for top roasts)
@@ -162,7 +160,7 @@ Files: `src/app/api/analyze/route.ts`, `src/lib/youtube.ts`, `convex/roasts.ts`
   - [x] Extract video ID (handle `watch?v=`, `youtu.be/`, shorts)
   - [x] Fetch transcript, trim to first 3,000 chars
   - [x] Fallback: "Could not fetch transcript. Try pasting text instead."
-- [x] Convex mutation `createRoast`: `{ contentText, sourceType, sourceUrl?, userId? }` → `roastId`, status: `pending`
+- [x] Convex mutation `createRoast`: `{ contentText, sourceType, sourceUrl?, isSlopBomb }` → `roastId`, status: `pending`
 
 **Depends on:** Phase 0
 
@@ -193,27 +191,19 @@ Files: `src/lib/hermes.ts`, `convex/roasts.ts`
   - System prompt (AI slop detection expert)
   - LinkUp search results (if any)
   - Content text
-  - Instruction to return JSON with `aiFU`, `originalityScore`, `fuScore`, `verdict`, `breakdown`
+  - Instruction to return JSON with `aiFU`, `originalityScore`, `fuScore`, `archetype`, `receipts`
 - [x] Parse JSON from LLM response
-- [x] Validate ranges (0–100 for scores, verdict ≤15 words)
+- [x] Validate ranges and array lengths
 - [x] Fallback: if JSON parsing fails, retry once with stricter prompt
-- [x] Convex mutation `updateRoastScores`: store scores, status: `scored`
+- [x] Convex mutation `updateRoastScores`: store scores and archetype/receipts, status: `scored`
 
 **Depends on:** Phase 3
 
 ---
 
-### Phase 10 — Dodo Payments (P1, 60 min)
+### Phase 10 — Deprecated (Replaced by Phase 8)
 
-Files: `src/app/api/create-checkout-session/route.ts`, `src/app/api/webhooks/dodo/route.ts`, `convex/users.ts`
-
-- [ ] Sign up for Dodo Payments, get API keys
-- [ ] Create product: "FU Unlimited" — $5/month
-- [ ] `POST /api/create-checkout-session` → redirect to Dodo hosted checkout
-- [ ] Webhook handler `/api/webhooks/dodo` → update subscription status in Convex
-- [ ] `getUserSubscription(userId)` → gates unlimited roasts
-
-**Depends on:** Phase 8 (user auth exists)
+*(General Dodo Payments tasks moved to Phase 8 to integrate tightly with the Slop Bomb/Bounty flow)*
 
 ---
 
@@ -222,15 +212,13 @@ Files: `src/app/api/create-checkout-session/route.ts`, `src/app/api/webhooks/dod
 ### Phase 11 — Polish & Launch (30 min)
 
 - [ ] Test full flow: paste text → roast card → download → share
-- [ ] Test YouTube URL → transcript → roast card
-- [ ] Test signup gate at 3 roasts
+- [ ] Test Slop Bomb flow: countdown, read receipt, ransom payment
 - [ ] Test error states (invalid URL, API failure, rate limit)
 - [ ] Datafast tracking all pages
-- [ ] Custom events: `roast_created`, `roast_shared`, `user_signed_up`
-- [ ] Confirm read-only dashboard access for judges
+- [ ] Custom events: `roast_created`, `bomb_dropped`, `ransom_paid`
 - [ ] Pre-generate 2–3 roast cards for well-known slop creators
 - [ ] Draft LinkedIn post text
-- [ ] DM list prepared
+- [ ] DM list prepared for dropping Slop Bombs
 - [ ] Final push to Cloudflare Pages
 - [ ] Verify custom domain (if any)
 - [ ] Confirm all env vars set on Cloudflare dashboard
@@ -248,13 +236,12 @@ Phase 0 (Scaffold)
   │   ├── Phase 5 (Score Card UI) ← needs BE Phase 4 data shape
   │   ├── Phase 6 (Client-Side PNG Export) ← needs Phase 5
   │   ├── Phase 7 (Roast Page) ← needs Phase 6 + BE Phase 4
-  │   ├── Phase 8 (Signup Gate) ← needs Phase 7
-  │   └── Phase 9 (Leaderboard) ← needs BE Phase 4
+  │   ├── Phase 8 (Monetization & Slop Bomb UX) ← needs Phase 7
+  │   └── Phase 9 (The Daily Slop Board) ← needs BE Phase 4
   └── Backend Track
       ├── Phase 2 (Content Extraction)
       ├── Phase 3 (LinkUp Scan) ← needs Phase 2
-      ├── Phase 4 (LLM Scoring) ← needs Phase 3
-      └── Phase 10 (Payments) ← needs Phase 8
+      └── Phase 4 (LLM Scoring) ← needs Phase 3
 ```
 
 **Parallel work possible after Phase 0:**
@@ -274,12 +261,12 @@ Phase 0 (Scaffold)
 | T+2:00 | Phase 5 (cont.) | Phase 4 — LLM Scoring |
 | T+2:45 | Phase 6 — Client-Side PNG Export | Phase 4 (cont.) |
 | T+3:30 | Phase 7 — Roast Page | Phase 4 (cont.) |
-| T+4:15 | Phase 8 — Signup Gate | (catch up / P1) |
-| T+5:00 | Phase 9 — Leaderboard (P1) | Phase 10 — Payments (P1) |
+| T+4:15 | Phase 8 — Monetization & Slop Bomb UX | (catch up / P1) |
+| T+5:00 | Phase 9 — Daily Slop Board (P1) | (catch up) |
 | T+5:45 | Phase 11 — Polish & Launch | Phase 11 — Polish & Launch |
 | T+6:15 | **SHIP** | **SHIP** |
 
-**Cut line:** At T+4:00, drop Phases 9–10 if behind.
+**Cut line:** At T+4:00, drop Phase 9 if behind.
 
 ---
 
@@ -296,13 +283,9 @@ OPENAI_API_KEY=
 # LinkUp
 LINKUP_API_KEY=
 
-# Dodo Payments (P1)
+# Dodo Payments
 DODO_API_KEY=
 DODO_WEBHOOK_SECRET=
-
-# Convex Auth
-GOOGLE_OAUTH_CLIENT_ID=
-AUTH_SECRET=
 
 # Datafast
 DATFAST_SNIPPET_ID=
@@ -323,12 +306,11 @@ fu/
 │   │   │   └── page.tsx                      # FE Phase 9
 │   │   └── api/
 │   │       ├── analyze/route.ts              # BE Phase 2
-│   │       ├── create-checkout-session/route.ts  # BE Phase 10
-│   │       └── webhooks/dodo/route.ts        # BE Phase 10
+│   │       └── webhooks/dodo/route.ts        # Phase 8
 │   ├── components/
 │   │   ├── ScoreCard.tsx                     # FE Phase 5
 │   │   ├── InputForm.tsx                     # FE Phase 1
-│   │   ├── AuthModal.tsx                     # FE Phase 8
+│   │   ├── RansomModal.tsx                   # FE Phase 8
 │   │   └── LeaderboardTable.tsx              # FE Phase 9
 │   ├── lib/
 │   │   ├── hermes.ts                         # BE Phase 4
@@ -339,10 +321,8 @@ fu/
 │       └── globals.css
 ├── convex/
 │   ├── schema.ts                             # Phase 0
-│   ├── auth.config.ts                        # FE Phase 8
-│   ├── auth.ts                               # FE Phase 8
 │   ├── roasts.ts                             # BE Phase 2/3/4
-│   └── users.ts                              # FE Phase 8 / BE Phase 10
+│   └── users.ts                              # Phase 8
 ├── public/
 │   └── fonts/
 ├── .env.local
