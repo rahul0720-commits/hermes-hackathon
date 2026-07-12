@@ -5,8 +5,7 @@ export async function generateFUMeter(content: string, searchResults: Record<str
     fuScore: 90,
     verdict: "A perfect storm of LinkedIn hustle culture buzzwords.",
     suspectedPrompt: "Write a preachy post about leadership but use zero concrete examples.",
-    archetype: "The Thought Leader",
-    receipts: [
+    breakdown: [
       "No API key provided, using fallback analysis.",
       "Detected high density of synthetic corporate jargon.",
       "Structures match boilerplate AI generation templates."
@@ -48,8 +47,7 @@ You MUST return ONLY a valid JSON object with the following schema:
   "fuScore": number (0-100, overall 'fuck you' / cringe rating of the content),
   "verdict": string (A savage, sarcastic one-line sentence, max 15 words. Example: "This reads like GPT-4 laundering a 2022 Medium article."),
   "suspectedPrompt": string (The exact, humiliating prompt the user probably typed to generate this garbage. Example: "Write a preachy 3-part listicle about B2B sales but make it sound like a deeply personal revelation."),
-  "archetype": string (Assign them a savage archetype. Examples: "The Thought Leader", "The Reply Guy", "Raw Chaos", "The Prompt Engineer"),
-  "receipts": string[] (Exactly 3 highly specific, humiliating callouts about their phrasing or structure. Example: "You started 18 sentences with 'In today's fast-paced world'.")
+  "breakdown": string[] (Exactly 3 bullet points explicitly citing the structural violations found in the text. Example: "Used the word 'holistic' unironically in paragraph 2.")
 }`
           },
           {
@@ -77,8 +75,7 @@ You MUST return ONLY a valid JSON object with the following schema:
         fuScore: typeof parsed.fuScore === 'number' ? parsed.fuScore : fallback.fuScore,
         verdict: typeof parsed.verdict === 'string' ? parsed.verdict : fallback.verdict,
         suspectedPrompt: typeof parsed.suspectedPrompt === 'string' ? parsed.suspectedPrompt : "Write a generic LinkedIn post about synergy.",
-        archetype: typeof parsed.archetype === 'string' ? parsed.archetype : fallback.archetype,
-        receipts: Array.isArray(parsed.receipts) ? parsed.receipts : fallback.receipts
+        breakdown: Array.isArray(parsed.breakdown) ? parsed.breakdown : fallback.breakdown
       };
     } catch (e) {
       console.error("Failed to parse generated FU Meter JSON:", e);

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rsync -a --exclude .git --exclude node_modules /private/tmp/claude-501/-Users-rahul-Documents-Hermes-Agent/1e5977ab-0dcc-4783-a846-e5b97873b71b/scratchpad/backend_repo/ '/Users/rahul/Documents/Hermes Agent/')",
+      "Bash(npm install *)",
+      "Read(//usr/local/**)",
+      "Read(//Users/rahul/.nvm/versions/**)",
+      "Bash(command -v volta fnm)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(grep -E '^\\(node|npm\\)$')",
+      "Read(//Applications/**)",
+      "Skill(artifact-design)",
+      "Skill(artifact-design:*)",
+      "Bash(python3 -m http.server 8123 --bind 127.0.0.1)",
+      "Bash(python3 -)",
+      "Bash(set -e)"
+    ]
+  }
+}
